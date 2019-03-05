@@ -1,0 +1,147 @@
+  <!DOCTYPE html>
+  <html>
+  <meta charset="utf-8" />
+  <head>
+  <title>Beer Pong Game</title>
+  <style type="text/css">
+  #wrap {
+    width: 805px;
+    height:265px;
+  }
+
+  .left {
+    width:400px;
+    height:200px;
+    float:left;
+  }
+
+  .right {
+    width:400px;
+    height:200px;
+    float:right;
+  }
+
+</style>
+  </head>
+
+  <body>
+
+  <script language="javascript" type="text/javascript">
+
+  var wsUri = "ws://10.9.8.2:3000/";
+  var username1;
+  var username2;
+  var teamname;
+  var gameInformation;
+
+  function init()
+  {
+    output = document.getElementById("output");
+    testWebSocket();
+  }
+
+  function testWebSocket()
+  {
+    websocket = new WebSocket(wsUri);
+    websocket.onopen = function(evt) { onOpen(evt) };
+    websocket.onclose = function(evt) { onClose(evt) };
+    websocket.onmessage = function(evt) { onMessage(evt) };
+    websocket.onerror = function(evt) { onError(evt) };
+  }
+
+  function onOpen(evt)
+  {
+    writeToScreen("CONNECTED");
+  }
+
+  function onClose(evt)
+  {
+    writeToScreen("DISCONNECTED");
+  }
+
+  function onMessage(evt)
+  {
+  	writeToScreen('<span style="color: blue;">RECEIVED: UserInfo</span>');
+    //'<span style="color: blue;">RESPONSE: ' + evt.data+'</span>'
+    //'<span style="color: blue;">RECEIVED: UserInfo</span>'
+    websocket.close();
+  }
+
+  function onError(evt)
+  {
+    writeToScreen('<span style="color: red;">ERROR:</span>');
+  }
+
+  function writeToScreen(message)
+  {
+    var pre = document.createElement("p");
+    pre.style.wordWrap = "break-word";
+    pre.innerHTML = message;
+    output.appendChild(pre);
+  }
+
+  function doSend(message)
+  {
+    writeToScreen("SENT: UserInfo");
+    websocket.send(message);
+  }
+
+  window.addEventListener("load", init, false);
+
+   function requestInfo()
+  {
+    username1 = document.getElementById("username1").value;
+
+    username2 = document.getElementById("username2").value;
+
+    teamname1 = document.getElementById("teamname1").value;
+
+    username3 = document.getElementById("username3").value;
+
+    username4 = document.getElementById("username4").value;
+
+    teamname2 = document.getElementById("teamname2").value;
+
+    gameInformation = username1+'-'+username2+'-'+teamname1+
+    '-'+username3+'-'+username4+'-'+teamname2+'#';
+    doSend(gameInformation);
+  }
+
+</script>
+
+ <!-- Layout -->
+<h1>Beer Pong</h1>
+<h3>Enter game information here</h3>
+<hr />
+<div id="wrap">
+
+  <div class="left">
+  <h3>Team 1</h3>
+  <p> Enter username 1: </p>
+  <input type="text" id="username1" name="username1" maxlength="15"/>
+  <p> Enter username 2: </p>
+  <input type="text" id="username2" name="username2" maxlength="15"/>
+  <p> Enter teamname: </p>
+  <input type="text" id="teamname1" name="teamname1" maxlength="15"/>
+  </div>
+
+  <div class="right">
+  <h3>Team 2</h3>
+  <p> Enter username 1: </p>
+  <input type="text" id="username3" name="username3" maxlength="15"/>
+  <p> Enter username 2: </p>
+  <input type="text" id="username4" name="username4" maxlength="15"/>
+  <p> Enter teamname: </p>
+  <input type="text" id="teamname2" name="teamname2" maxlength="15"/>
+  </div>
+</div>
+
+  <br /><br />
+  <hr />
+  <br />
+  <button type="button" onclick="requestInfo()">Start</button>
+
+  <div id="output"></div>
+
+</body>
+</html>

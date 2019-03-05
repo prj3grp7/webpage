@@ -1,0 +1,230 @@
+  <!DOCTYPE html>
+  <html>
+  <meta charset="utf-8" />
+  <head>
+  <title>Beer Pong Game</title>
+  <style type="text/css">
+  #wrap {
+    width: 805px;
+    height:575px;
+  }
+
+  .left {
+    width:400px;
+    height:200px;
+    float:left;
+  }
+
+  .right {
+    width:400px;
+    height:200px;
+    float:right;
+  }
+
+  #display1{
+    width: 28%;
+    height: 100px;
+    background: #ff0000;
+    transition: background 100ms;
+    margin-top: 30px;
+    border: 1px solid #000;
+  }
+
+  #display2{
+    width: 28%;
+    height: 100px;
+    background: #3333ff;
+    transition: background 100ms;
+    margin-top: 30px;
+    border: 1px solid #000;
+  }
+
+  input[type=range]{
+    display: block;
+    width: 50;
+  }
+
+
+</style>
+  </head>
+
+  <body>
+   <!-- Layout -->
+<h1>Beer Pong</h1>
+<!-- <h3>Enter game information here</h3> -->
+<hr />
+<div id="wrap">
+
+  <div class="left">
+  <h3>Team 1</h3>
+  <p> Enter username 1: </p>
+  <input type="text" id="username1" name="username1" maxlength="15"/>
+  <p> Enter username 2: </p>
+  <input type="text" id="username2" name="username2" maxlength="15"/>
+  <p> Enter teamname: </p>
+  <input type="text" id="teamname1" name="teamname1" maxlength="15"/>
+  <br />
+  <p> Enter team color: </p>
+  <div class="picker1">
+  Red <input type="range" min="0" max="255" step="1" id="red1" value="255">
+  Green <input type="range" min="0" max="255" step="1" id="green1" value="0">
+  Blue <input type="range" min="0" max="255" step="1" id="blue1" value="0">
+  <div id="display1"></div>
+</div>
+</div>
+
+  <div class="right">
+  <h3>Team 2</h3>
+  <p> Enter username 1: </p>
+  <input type="text" id="username3" name="username3" maxlength="15"/>
+  <p> Enter username 2: </p>
+  <input type="text" id="username4" name="username4" maxlength="15"/>
+  <p> Enter teamname: </p>
+  <input type="text" id="teamname2" name="teamname2" maxlength="15"/>
+  <br />
+  <p> Enter team color: </p>
+  <div class="picker2">
+  Red <input type="range" min="0" max="255" step="1" id="red2" value="51">
+  Green <input type="range" min="0" max="255" step="1" id="green2" value="51">
+  Blue <input type="range" min="0" max="255" step="1" id="blue2" value="255">
+  <div id="display2"></div>
+</div>
+</div>
+</div>
+
+  <br /><br />
+  <hr />
+  <br />
+  <button type="button" onclick="acquireInfo()">Start</button>
+
+  <div id="output"></div>
+
+</body>
+
+  <script language="javascript" type="text/javascript">
+
+  var wsUri = "ws://10.9.8.2:3000/";
+  var username1;
+  var username2;
+  var teamname;
+  var gameInformation;
+  var red1, green1, blue1;
+  var red2, green2, blue2;
+
+  function init()
+  {
+    output = document.getElementById("output");
+    testWebSocket();
+  }
+
+  function testWebSocket()
+  {
+    websocket = new WebSocket(wsUri);
+    websocket.onopen = function(evt) { onOpen(evt) };
+    websocket.onclose = function(evt) { onClose(evt) };
+    websocket.onmessage = function(evt) { onMessage(evt) };
+    websocket.onerror = function(evt) { onError(evt) };
+  }
+
+  function onOpen(evt)
+  {
+    writeToScreen("CONNECTED");
+  }
+
+  function onClose(evt)
+  {
+    writeToScreen("DISCONNECTED");
+  }
+
+  function onMessage(evt)
+  {
+  	writeToScreen('<span style="color: blue;">RESPONSE: ' + evt.data+'</span>');
+    //'<span style="color: blue;">RESPONSE: ' + evt.data+'</span>'
+    //'<span style="color: blue;">RECEIVED: UserInfo</span>'
+    websocket.close();
+  }
+
+  function onError(evt)
+  {
+    writeToScreen('<span style="color: red;">ERROR:</span>');
+  }
+
+  function writeToScreen(message)
+  {
+    var pre = document.createElement("p");
+    pre.style.wordWrap = "break-word";
+    pre.innerHTML = message;
+    output.appendChild(pre);
+  }
+
+  function doSend(message)
+  {
+    writeToScreen("SENT: UserInfo");
+    websocket.send(message);
+  }
+
+  // Displaying team colors
+
+  var input1 = document.querySelectorAll('input[type="range"]');
+
+      for(var i = 0; i<input1.length; i++) {
+        input1[i].addEventListener("input", function(){
+          red1 = document.getElementById("red1").value,
+          green1 = document.getElementById("green1").value,
+          blue1 = document.getElementById("blue1").value;
+
+          var display1 = document.getElementById("display1");
+          display1.style.background = "rgb(" + red1 + ", " + green1 + ", " + blue1 + ")";
+        });
+      }
+
+  var input2 = document.querySelectorAll('input[type="range"]');
+
+      for(var i = 0; i<input2.length; i++) {
+        input2[i].addEventListener("input", function(){
+          red2 = document.getElementById("red2").value,
+          green2 = document.getElementById("green2").value,
+          blue2 = document.getElementById("blue2").value;
+
+          var display2 = document.getElementById("display2");
+          display2.style.background = "rgb(" + red + ", " + green + ", " + blue + ")";
+        });
+      }
+
+  window.addEventListener("load", init, false);
+
+   function acquireInfo()
+  {
+    username1 = document.getElementById("username1").value;
+
+    username2 = document.getElementById("username2").value;
+
+    teamname1 = document.getElementById("teamname1").value;
+
+    red1 = document.getElementById("red1").value;
+
+    green1 = document.getElementById("green1").value;
+
+    blue1 = document.getElementById("blue1").value;
+
+    username3 = document.getElementById("username3").value;
+
+    username4 = document.getElementById("username4").value;
+
+    teamname2 = document.getElementById("teamname2").value;
+
+    red2 = document.getElementById("red2").value;
+
+    green2 = document.getElementById("green2").value;
+
+    blue2 = document.getElementById("blue2").value;
+
+    gameInformation = username1+'-'+username2+'-'+teamname1+
+    '-'+red1.tostring(16)+'-'+green1.tostring(16)+'-'+blue1.tostring(16)+
+    '-'+username3+'-'+username4+'-'+teamname2+
+    '-'+red2.tostring(16)+'-'+green2.tostring(16)+'-'+blue2.tostring(16)+'#';
+    doSend(gameInformation);
+  }
+
+</script>
+</html>
